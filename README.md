@@ -1,65 +1,83 @@
-<img width="1303" alt="Screenshot 2024-04-26 at 9 19 48 AM" src="https://github.com/Prince-1501/url-shortner/assets/37762770/a97137c1-c4b9-4266-843b-b98e0edac128">
+Sure, here's a `README.md` file that provides guidance without including the code directly.
 
+```markdown
 # URL Shortener
 
-A simple URL shortening service built in Go.
+This is a simple URL shortener application built with Go for the backend and a basic HTML frontend.
 
-## Overview
+## Features
 
-This project provides a basic URL-shortening service implemented in Go. It allows users to shorten long URLs into more manageable and shareable links. The service also includes a redirect feature to redirect users from the shortened URL to the original long URL.
+- Shorten long URLs
+- Redirect to the original URL using the shortened URL
+- Serve static files
 
-## Installation
+## Project Structure
 
-To use the URL shortener, you need to have Go installed on your system. You can download and install Go from the [official Go website](https://go.dev/).
+```
+/url-shortener
+    /static
+        index.html
+    main.go
+```
 
-Clone the repository to your local machine:
+## Prerequisites
+
+- Go installed on your machine
+- Basic knowledge of Go, HTML, and JavaScript
+
+## Getting Started
+
+### Clone the Repository
 
 ```sh
-git clone https://github.com/Prince-1501/url-shortner.git
+git clone https://github.com/your-username/url-shortener.git
+cd url-shortener
 ```
 
-## Usage
+### Set Up the Backend
 
-### Running the Server
+The backend is written in Go and handles URL shortening and redirection.
 
-Navigate to the project directory and run the following command to start the server:
+1. **Navigate to the project directory**:
+    ```sh
+    cd url-shortener
+    ```
 
-```sh
-go run main.go
-```
+2. **Run the Go server**:
+    ```sh
+    go run main.go
+    ```
 
-The server will start listening on port `8080` by default. You can change the port in the `main.go` file if needed.
+The server will start on port `5000`.
 
-### Shortening a URL
+### Access the Frontend
 
-To shorten a URL, send a POST request to the `/shorten` endpoint with a JSON payload containing the original URL:
+1. **Open your web browser** and navigate to `http://localhost:5000` to access the frontend.
+2. **Enter a URL** in the input field and click the "Shorten URL" button.
+3. **Copy the generated short URL** and use it to be redirected to the original URL.
 
-```sh
-curl -X POST http://localhost:8080/shorten -H "Content-Type: application/json" -d '{"url": "https://example.com"}'
-```
+## Project Breakdown
 
-The response will contain a JSON object with the shortened URL:
+### Backend (`main.go`)
 
-```json
-{
-    "short_url": "https://www.linkedin.com/in/iamprince/"
-}
-```
+- **URL Struct and In-Memory Database**: Define a struct to store URL information and use a map for in-memory storage.
+- **URL Shortening Function**: Use MD5 hashing to generate a short URL.
+- **Create and Retrieve URL Functions**: Implement functions to create a short URL and retrieve the original URL.
+- **HTTP Handlers**: Set up handlers for the root page, URL shortening, and redirection.
+- **Main Function**: Start the HTTP server and serve static files.
 
-### Redirecting to the Original URL
+### Frontend (`static/index.html`)
 
-To redirect to the original URL, visit the shortened URL in your browser or send a GET request to the `/redirect/{id}` endpoint, where `{id}` is the shortened URL ID:
+- **HTML Structure**: Provide an input form for users to enter URLs and display the shortened URLs.
+- **JavaScript**: Handle form submissions, send requests to the backend, and display responses.
 
-```sh
-curl http://localhost:8080/redirect/abcdef
-```
+## Conclusion
 
-This will redirect you to the original URL associated with the shortened URL.
-
-## Contributing
-
-Contributions are welcome! Feel free to fork the repository and submit pull requests.
+You've now set up a simple URL shortener with a Go backend and a basic HTML frontend. Feel free to expand on this project by adding features such as persistent storage with a database, user authentication, or analytics.
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+```
+
+This `README.md` file provides an overview and guidance without including the code directly, making it concise and easy to follow.
