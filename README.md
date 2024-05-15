@@ -1,5 +1,3 @@
-Sure, here's a `README.md` file that provides guidance without including the code directly.
-
 ```markdown
 # URL Shortener
 
