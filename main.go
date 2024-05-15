@@ -12,45 +12,33 @@ import (
 
 type URL struct {
 	ID           string    `json:"id"`
-	OriginalURL  string    `json:"original_url"`
+	OrignalURL   string    `json:"orignal_url"`
 	ShortURL     string    `json:"short_url"`
 	CreationDate time.Time `json:"creation_date"`
 }
 
-/*
-	d9736711 --> {
-					ID: "d9736711",
-					OriginalURL: "https://github.com/Prince-1501/",
-					ShortURL: "d9736711",
-					CreationDate: time.Now()
-				}
-*/
 var urlDB = make(map[string]URL)
 
-func generateShortURL(OriginalURL string) string {
+func generateShortURL(OrignalURL string) string {
 	hasher := md5.New()
-	hasher.Write([]byte(OriginalURL)) // It converts the originalURL string to a byte slice
-	fmt.Println("hasher: ", hasher)
-	data := hasher.Sum(nil)
-	fmt.Println("hasher data: ", data)
-	hash := hex.EncodeToString(data)
-	fmt.Println("EncodeToString: ", hash)
-	fmt.Println("final string: ", hash[:8])
+	hasher.Write([]byte(OrignalURL)) // converting orignalURL into byte slice
+	hash := hex.EncodeToString(hasher.Sum(nil))
 	return hash[:8]
 }
 
-func createURL(originalURL string) string {
-	shortURL := generateShortURL(originalURL)
-	id := shortURL // Use the short URL as the ID for simplicity
+func createURL(orignalURL string) string {
+	shortURL := generateShortURL(orignalURL)
+	id := shortURL // short URL as the ID for simplification
 	urlDB[id] = URL{
 		ID:           id,
-		OriginalURL:  originalURL,
+		OrignalURL:   orignalURL,
 		ShortURL:     shortURL,
 		CreationDate: time.Now(),
 	}
 	return shortURL
 }
 
+// To Retrieve URL from ID
 func getURL(id string) (URL, error) {
 	url, ok := urlDB[id]
 	if !ok {
@@ -59,8 +47,9 @@ func getURL(id string) (URL, error) {
 	return url, nil
 }
 
-func RootPageURL(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, world!")
+// Setting up handlers
+func rootPageURL(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./static/index.html")
 }
 
 func ShortURLHandler(w http.ResponseWriter, r *http.Request) {
@@ -69,12 +58,11 @@ func ShortURLHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		http.Error(w, "Invalid Request body", http.StatusBadRequest)
 		return
 	}
 
 	shortURL_ := createURL(data.URL)
-	// fmt.Fprintf(w, shortURL)
 	response := struct {
 		ShortURL string `json:"short_url"`
 	}{ShortURL: shortURL_}
@@ -83,29 +71,32 @@ func ShortURLHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func redirectURLHandler(w http.ResponseWriter, r *http.Request) {
+func redirectURLhandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Path[len("/redirect/"):]
+	if id == "" {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
 	url, err := getURL(id)
 	if err != nil {
-		http.Error(w, "Invalid request", http.StatusNotFound)
+		http.Error(w, "URL not found", http.StatusNotFound)
+		return
 	}
-	http.Redirect(w, r, url.OriginalURL, http.StatusFound)
+	http.Redirect(w, r, url.OrignalURL, http.StatusFound)
 }
 
 func main() {
-	// fmt.Println("Starting URL shortener...")
-	// OriginalURL := "https://github.com/Prince-1501/"
-	// generateShortURL(OriginalURL)
-
-	// Register the handler function to handle all requests to the root URL ("/")
-	http.HandleFunc("/", RootPageURL)
+	http.HandleFunc("/", rootPageURL)
 	http.HandleFunc("/shorten", ShortURLHandler)
-	http.HandleFunc("/redirect/", redirectURLHandler)
+	http.HandleFunc("/redirect/", redirectURLhandler)
 
-	// Start the HTTP server on port 8080
-	fmt.Println("Starting server on port 3000...")
-	err := http.ListenAndServe(":3000", nil)
+	// Serve static files
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+
+	// Start the HTTP server on Port 5000
+	fmt.Println("Starting server on Port 5000...")
+	err := http.ListenAndServe(":5000", nil)
 	if err != nil {
-		fmt.Println("Error on starting server:", err)
+		fmt.Println("Error running the server:", err)
 	}
 }
